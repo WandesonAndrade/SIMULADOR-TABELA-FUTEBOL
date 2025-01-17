@@ -1,0 +1,10 @@
+@media (max-width: 768px) {
+  .tabela-jogos {
+    grid-template-columns: 1fr;
+  }
+
+  table,
+  .jogos ul {
+    font-size: 12px;
+  }
+}
