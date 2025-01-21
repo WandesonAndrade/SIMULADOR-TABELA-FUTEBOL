@@ -167,6 +167,8 @@ document.addEventListener("DOMContentLoaded", () => {
       cardsContainer.appendChild(card);
     });
   }
+  let statusTeamA;
+  let statusTeamB;
 
   function calculateResults() {
     Object.keys(teamsData).forEach((team) => {
@@ -182,8 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
       }
     });
-    //console.log(teamsData);
-    //console.log(currentRound + 1);
+
     const cards = cardsContainer.querySelectorAll(".card");
 
     cards.forEach((card) => {
@@ -196,48 +197,67 @@ document.addEventListener("DOMContentLoaded", () => {
       const scoreA = parseInt(scores[0].value);
       const scoreB = parseInt(scores[1].value);
 
-      //console.log(`${teamA} ${scoreA} x ${scoreB} ${teamB}`);
-
       const x = currentRound;
+
       if (!isNaN(scoreA) || !isNaN(scoreB)) {
-        if (x >= teamsData[teamA].games || x >= teamsData[teamB].games) {
+        console.log(
+          `ANTES: STATUS ${teamA}: ${statusTeamA} STATUS ${teamB}: ${statusTeamB}`
+        );
+        if (
+          currentRound === 0 &&
+          teamsData[teamA].games === 0 &&
+          teamsData[teamB].games === 0
+        ) {
+          teamsData[teamA].games++;
+          teamsData[teamB].games++;
+        }
+        if (teamsData[teamA].games < x || teamsData[teamB].games < x) {
           teamsData[teamA].games++;
           teamsData[teamB].games++;
 
           rounds[currentRound].forEach((game, index) => {
             if (game.teamA === teamA && game.teamB === teamB) {
-              //console.log(index);
               teamsData[teamA].gf = scoreA || 0;
               teamsData[teamB].gf = scoreB || 0;
-              //console.log(rounds[currentRound]);
-              console.log(index);
+
               rounds[currentRound][index].golsA = scoreA || 0;
               rounds[currentRound][index].golsB = scoreB || 0;
               teamsData[teamA].ga = scoreB || 0;
               teamsData[teamB].ga = scoreA || 0;
-              //console.log(rounds[currentRound][0]);
             }
           });
         }
       }
 
       if (scoreA > scoreB) {
-        teamsData[teamA].points += 3;
+        statusTeamA = "win";
+        statusTeamB = "loss";
         if (teamsData[teamA].games > teamsData[teamA].wins) {
           teamsData[teamA].wins++;
+          teamsData[teamA].points = teamsData[teamA].wins * 3;
           teamsData[teamB].losses++;
         }
       } else if (scoreA < scoreB) {
-        teamsData[teamB].points += 3;
+        statusTeamA = "loss";
+        statusTeamB = "win";
         if (teamsData[teamB].games > teamsData[teamB].wins) {
           teamsData[teamB].wins++;
+          teamsData[teamB].points = teamsData[teamB].wins * 3;
           teamsData[teamA].losses++;
         }
       } else if (!isNaN(scoreA) && !isNaN(scoreB)) {
+        statusTeamA = "draw";
+        statusTeamB = "draw";
+        let antesA = 0;
+        antesA = teamsData[teamA].draws;
         teamsData[teamA].points++;
         teamsData[teamB].points++;
         teamsData[teamA].draws++;
         teamsData[teamB].draws++;
+        //console.log(`antes ${antesA} depois ${teamsData[teamA].draws}`);
+        console.log(
+          `DEPOIS: STATUS ${teamA}: ${statusTeamA} STATUS ${teamB}: ${statusTeamB}`
+        );
       }
     });
 
