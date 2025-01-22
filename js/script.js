@@ -1,14 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Dados das rodadas
-  let gol = null;
+  let gol;
   const rounds = [
     // Rodada 1
     [
       {
         teamA: "Tuntum",
         golsA: gol,
+        statusTeamA: "",
         teamB: "Imperatriz",
-        golsB: null,
+        golsB: gol,
+        statusTeamB: "",
         time: "15:30",
       },
       { teamA: "Pinheiro-MA", teamB: "Maranhão", time: "19:30" },
@@ -167,8 +169,27 @@ document.addEventListener("DOMContentLoaded", () => {
       cardsContainer.appendChild(card);
     });
   }
-  let statusTeamA;
-  let statusTeamB;
+  let statusTeamA = "";
+  let statusTeamB = "";
+
+  function calcularGolsTotal(time) {
+    let totalGols = 0;
+
+    rounds.forEach((rodada) => {
+      rodada.forEach((jogo) => {
+        if (jogo.teamA === time && !isNaN(jogo.golsA)) {
+          totalGols += jogo.golsA;
+        }
+        if (jogo.teamB === time && !isNaN(jogo.golsB)) {
+          totalGols += jogo.golsB;
+        }
+      });
+    });
+
+    return totalGols;
+  }
+
+  // Exemplo de uso para o time "Tuntum"
 
   function calculateResults() {
     Object.keys(teamsData).forEach((team) => {
@@ -184,7 +205,6 @@ document.addEventListener("DOMContentLoaded", () => {
         };
       }
     });
-
     const cards = cardsContainer.querySelectorAll(".card");
 
     cards.forEach((card) => {
@@ -200,9 +220,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const x = currentRound;
 
       if (!isNaN(scoreA) || !isNaN(scoreB)) {
-        console.log(
-          `ANTES: STATUS ${teamA}: ${statusTeamA} STATUS ${teamB}: ${statusTeamB}`
-        );
         if (
           currentRound === 0 &&
           teamsData[teamA].games === 0 &&
@@ -214,50 +231,77 @@ document.addEventListener("DOMContentLoaded", () => {
         if (teamsData[teamA].games < x || teamsData[teamB].games < x) {
           teamsData[teamA].games++;
           teamsData[teamB].games++;
-
-          rounds[currentRound].forEach((game, index) => {
-            if (game.teamA === teamA && game.teamB === teamB) {
-              teamsData[teamA].gf = scoreA || 0;
-              teamsData[teamB].gf = scoreB || 0;
-
-              rounds[currentRound][index].golsA = scoreA || 0;
-              rounds[currentRound][index].golsB = scoreB || 0;
-              teamsData[teamA].ga = scoreB || 0;
-              teamsData[teamB].ga = scoreA || 0;
-            }
-          });
         }
+        rounds[currentRound].forEach((game, index) => {
+          if (game.teamA === teamA && game.teamB === teamB) {
+            rounds[currentRound][index].golsA = scoreA || 0;
+            rounds[currentRound][index].golsB = scoreB || 0;
+
+            teamsData[teamA].gf = calcularGolsTotal(teamA) || 0;
+            teamsData[teamB].gf = calcularGolsTotal(teamB) || 0;
+
+            teamsData[teamA].ga = calcularGolsTotal(teamB) || 0;
+            teamsData[teamB].ga = calcularGolsTotal(teamA) || 0;
+          }
+        });
+        const golsTuntum = calcularGolsTotal("Tuntum");
+        console.log(`Total de gols do Tuntum: ${golsTuntum}`);
       }
 
-      if (scoreA > scoreB) {
-        statusTeamA = "win";
-        statusTeamB = "loss";
-        if (teamsData[teamA].games > teamsData[teamA].wins) {
-          teamsData[teamA].wins++;
-          teamsData[teamA].points = teamsData[teamA].wins * 3;
-          teamsData[teamB].losses++;
+      const status = () => {
+        console
+          .log
+          //  `ANTES: STATUS ${teamA}: ${statusTeamA} STATUS ${teamB}: ${statusTeamB}`
+          ();
+
+        if (scoreA > scoreB) {
+          statusTeamA = "win";
+          statusTeamB = "loss";
+          if (teamsData[teamA].games > teamsData[teamA].wins) {
+            teamsData[teamA].wins++;
+            teamsData[teamB].losses++;
+          }
+        } else if (scoreB > scoreA) {
+          statusTeamB = "win";
+          statusTeamA = "loss";
+          if (teamsData[teamB].games > teamsData[teamB].wins) {
+            teamsData[teamB].wins++;
+            teamsData[teamA].losses++;
+          }
+        } else if (scoreA == scoreB) {
+          statusTeamA = "draw";
+          statusTeamB = "draw";
+
+          teamsData[teamA].draws++;
+          teamsData[teamB].draws++;
         }
-      } else if (scoreA < scoreB) {
-        statusTeamA = "loss";
-        statusTeamB = "win";
-        if (teamsData[teamB].games > teamsData[teamB].wins) {
-          teamsData[teamB].wins++;
-          teamsData[teamB].points = teamsData[teamB].wins * 3;
-          teamsData[teamA].losses++;
+      };
+
+      if (!isNaN(scoreA) && !isNaN(scoreB)) {
+        if (statusTeamA == "" && statusTeamB == "") {
+          status();
+        } else {
+          if (statusTeamA == "win") {
+            teamsData[teamA].wins--;
+          } else if (statusTeamA == "loss") {
+            teamsData[teamA].losses--;
+          } else if (statusTeamA == "draw") {
+            teamsData[teamA].draws--;
+          }
+          if (statusTeamB == "win") {
+            teamsData[teamB].wins--;
+          } else if (statusTeamB == "loss") {
+            teamsData[teamB].losses--;
+          } else if (statusTeamB == "draw") {
+            teamsData[teamB].draws--;
+          }
+          status();
         }
-      } else if (!isNaN(scoreA) && !isNaN(scoreB)) {
-        statusTeamA = "draw";
-        statusTeamB = "draw";
-        let antesA = 0;
-        antesA = teamsData[teamA].draws;
-        teamsData[teamA].points++;
-        teamsData[teamB].points++;
-        teamsData[teamA].draws++;
-        teamsData[teamB].draws++;
-        //console.log(`antes ${antesA} depois ${teamsData[teamA].draws}`);
-        console.log(
-          `DEPOIS: STATUS ${teamA}: ${statusTeamA} STATUS ${teamB}: ${statusTeamB}`
-        );
+
+        teamsData[teamA].points =
+          teamsData[teamA].wins * 3 + teamsData[teamA].draws;
+        teamsData[teamB].points =
+          teamsData[teamB].wins * 3 + teamsData[teamB].draws;
       }
     });
 
