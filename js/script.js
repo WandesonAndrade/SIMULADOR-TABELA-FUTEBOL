@@ -173,20 +173,53 @@ document.addEventListener("DOMContentLoaded", () => {
   let statusTeamB = "";
 
   function calcularGolsTotal(time) {
-    let totalGols = 0;
+    let totalGF = 0;
+    let totalGA = 0;
+
+    let totalWins = 0;
+    let totalDraws = 0;
+    let totalLosses = 0;
 
     rounds.forEach((rodada) => {
       rodada.forEach((jogo) => {
         if (jogo.teamA === time && !isNaN(jogo.golsA)) {
-          totalGols += jogo.golsA;
+          totalGF += jogo.golsA;
+          totalGA += jogo.golsB;
+          if (jogo.golsA > jogo.golsB) {
+            statusTeamA = "win";
+            totalWins++;
+          } else if (jogo.golsA < jogo.golsB) {
+            statusTeamA = "loss";
+            totalLosses++;
+          } else {
+            totalDraws++;
+            statusTeamA = "draw";
+          }
         }
         if (jogo.teamB === time && !isNaN(jogo.golsB)) {
-          totalGols += jogo.golsB;
+          totalGF += jogo.golsB;
+          totalGA += jogo.golsA;
+          if (jogo.golsB > jogo.golsA) {
+            statusTeamB = "win";
+            totalWins++;
+          } else if (jogo.golsB < jogo.golsA) {
+            statusTeamB = "loss";
+            totalLosses++;
+          } else {
+            statusTeamB = "draw";
+            totalDraws++;
+          }
         }
       });
     });
 
-    return totalGols;
+    return {
+      golsFeitos: totalGF,
+      golsSofridos: totalGA,
+      vitorias: totalWins,
+      empates: totalDraws,
+      derrotas: totalLosses,
+    };
   }
 
   // Exemplo de uso para o time "Tuntum"
@@ -217,8 +250,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const scoreA = parseInt(scores[0].value);
       const scoreB = parseInt(scores[1].value);
 
-      const x = currentRound;
-
       if (!isNaN(scoreA) || !isNaN(scoreB)) {
         if (
           currentRound === 0 &&
@@ -228,7 +259,10 @@ document.addEventListener("DOMContentLoaded", () => {
           teamsData[teamA].games++;
           teamsData[teamB].games++;
         }
-        if (teamsData[teamA].games < x || teamsData[teamB].games < x) {
+        if (
+          teamsData[teamA].games < currentRound ||
+          teamsData[teamB].games < currentRound
+        ) {
           teamsData[teamA].games++;
           teamsData[teamB].games++;
         }
@@ -237,11 +271,20 @@ document.addEventListener("DOMContentLoaded", () => {
             rounds[currentRound][index].golsA = scoreA || 0;
             rounds[currentRound][index].golsB = scoreB || 0;
 
-            teamsData[teamA].gf = calcularGolsTotal(teamA) || 0;
-            teamsData[teamB].gf = calcularGolsTotal(teamB) || 0;
+            teamsData[teamA].gf = calcularGolsTotal(teamA).golsFeitos || 0;
+            teamsData[teamB].gf = calcularGolsTotal(teamB).golsFeitos || 0;
 
-            teamsData[teamA].ga = calcularGolsTotal(teamB) || 0;
-            teamsData[teamB].ga = calcularGolsTotal(teamA) || 0;
+            teamsData[teamA].ga = calcularGolsTotal(teamA).golsSofridos || 0;
+            teamsData[teamB].ga = calcularGolsTotal(teamB).golsSofridos || 0;
+
+            teamsData[teamA].wins = calcularGolsTotal(teamA).vitorias || 0;
+            teamsData[teamB].wins = calcularGolsTotal(teamB).vitorias || 0;
+
+            teamsData[teamA].draws = calcularGolsTotal(teamA).empates || 0;
+            teamsData[teamB].draws = calcularGolsTotal(teamB).empates || 0;
+
+            teamsData[teamA].losses = calcularGolsTotal(teamA).derrotas || 0;
+            teamsData[teamB].losses = calcularGolsTotal(teamB).derrotas || 0;
           }
         });
         const golsTuntum = calcularGolsTotal("Tuntum");
