@@ -1,16 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Dados das rodadas
   let gol;
+  let games;
   const rounds = [
     // Rodada 1
     [
       {
         teamA: "Tuntum",
         golsA: gol,
-        statusTeamA: "",
+        games: games,
         teamB: "Imperatriz",
         golsB: gol,
-        statusTeamB: "",
+        games: games,
         time: "15:30",
       },
       { teamA: "Pinheiro-MA", teamB: "Maranhão", time: "19:30" },
@@ -180,33 +181,31 @@ document.addEventListener("DOMContentLoaded", () => {
     let totalDraws = 0;
     let totalLosses = 0;
 
+    let totalGames = 0;
+
     rounds.forEach((rodada) => {
       rodada.forEach((jogo) => {
         if (jogo.teamA === time && !isNaN(jogo.golsA)) {
           totalGF += jogo.golsA;
           totalGA += jogo.golsB;
+          totalGames++;
           if (jogo.golsA > jogo.golsB) {
-            statusTeamA = "win";
             totalWins++;
           } else if (jogo.golsA < jogo.golsB) {
-            statusTeamA = "loss";
             totalLosses++;
           } else {
             totalDraws++;
-            statusTeamA = "draw";
           }
         }
         if (jogo.teamB === time && !isNaN(jogo.golsB)) {
           totalGF += jogo.golsB;
           totalGA += jogo.golsA;
+          totalGames++;
           if (jogo.golsB > jogo.golsA) {
-            statusTeamB = "win";
             totalWins++;
           } else if (jogo.golsB < jogo.golsA) {
-            statusTeamB = "loss";
             totalLosses++;
           } else {
-            statusTeamB = "draw";
             totalDraws++;
           }
         }
@@ -219,6 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
       vitorias: totalWins,
       empates: totalDraws,
       derrotas: totalLosses,
+      jogos: totalGames,
     };
   }
 
@@ -251,21 +251,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const scoreB = parseInt(scores[1].value);
 
       if (!isNaN(scoreA) || !isNaN(scoreB)) {
-        if (
-          currentRound === 0 &&
-          teamsData[teamA].games === 0 &&
-          teamsData[teamB].games === 0
-        ) {
-          teamsData[teamA].games++;
-          teamsData[teamB].games++;
-        }
-        if (
-          teamsData[teamA].games < currentRound ||
-          teamsData[teamB].games < currentRound
-        ) {
-          teamsData[teamA].games++;
-          teamsData[teamB].games++;
-        }
         rounds[currentRound].forEach((game, index) => {
           if (game.teamA === teamA && game.teamB === teamB) {
             rounds[currentRound][index].golsA = scoreA || 0;
@@ -285,36 +270,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
             teamsData[teamA].losses = calcularGolsTotal(teamA).derrotas || 0;
             teamsData[teamB].losses = calcularGolsTotal(teamB).derrotas || 0;
+
+            if (scoreA > scoreB) {
+              statusTeamA = "win";
+              statusTeamB = "loss";
+            } else if (scoreB > scoreA) {
+              statusTeamB = "win";
+              statusTeamA = "loss";
+            } else if (scoreA == scoreB) {
+              statusTeamA = "draw";
+              statusTeamB = "draw";
+            }
           }
         });
-        const golsTuntum = calcularGolsTotal("Tuntum");
-        console.log(`Total de gols do Tuntum: ${golsTuntum}`);
+
+        teamsData[teamA].games = calcularGolsTotal(teamA).jogos || 0;
+        teamsData[teamB].games = calcularGolsTotal(teamB).jogos || 0;
       }
-
       const status = () => {
-        console
-          .log
-          //  `ANTES: STATUS ${teamA}: ${statusTeamA} STATUS ${teamB}: ${statusTeamB}`
-          ();
-
         if (scoreA > scoreB) {
-          statusTeamA = "win";
-          statusTeamB = "loss";
           if (teamsData[teamA].games > teamsData[teamA].wins) {
             teamsData[teamA].wins++;
             teamsData[teamB].losses++;
           }
         } else if (scoreB > scoreA) {
-          statusTeamB = "win";
-          statusTeamA = "loss";
           if (teamsData[teamB].games > teamsData[teamB].wins) {
             teamsData[teamB].wins++;
             teamsData[teamA].losses++;
           }
         } else if (scoreA == scoreB) {
-          statusTeamA = "draw";
-          statusTeamB = "draw";
-
           teamsData[teamA].draws++;
           teamsData[teamB].draws++;
         }
@@ -326,6 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           if (statusTeamA == "win") {
             teamsData[teamA].wins--;
+            console.log(rounds[currentRound][0].statusTeamA);
           } else if (statusTeamA == "loss") {
             teamsData[teamA].losses--;
           } else if (statusTeamA == "draw") {
