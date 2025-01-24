@@ -9,9 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
         teamA: "Tuntum",
         golsA: gol,
         games: games,
+        statusTeamA: "",
         teamB: "Imperatriz",
         golsB: gol,
         games: games,
+        statusTeamB: "",
         time: "15:30",
       },
       { teamA: "Pinheiro-MA", teamB: "Maranhão", time: "19:30" },
@@ -69,7 +71,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const rodadaTitle = document.getElementById("rodada-title");
 
   const teamsData = {
-    Tuntum: { points: 0, games: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0 },
+    Tuntum: {
+      points: 0,
+      games: 0,
+      wins: 0,
+      draws: 0,
+      losses: 0,
+      gf: 0,
+      ga: 0,
+      history: "",
+    },
     Imperatriz: {
       points: 0,
       games: 0,
@@ -78,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
       losses: 0,
       gf: 0,
       ga: 0,
+      history: "",
     },
     "Pinheiro-MA": {
       points: 0,
@@ -87,6 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
       losses: 0,
       gf: 0,
       ga: 0,
+      history: "",
     },
     Maranhão: {
       points: 0,
@@ -96,8 +109,18 @@ document.addEventListener("DOMContentLoaded", () => {
       losses: 0,
       gf: 0,
       ga: 0,
+      history: "",
     },
-    IAPE: { points: 0, games: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0 },
+    IAPE: {
+      points: 0,
+      games: 0,
+      wins: 0,
+      draws: 0,
+      losses: 0,
+      gf: 0,
+      ga: 0,
+      history: "",
+    },
     Sampaio: {
       points: 0,
       games: 0,
@@ -106,6 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
       losses: 0,
       gf: 0,
       ga: 0,
+      history: "",
     },
     "Moto Club": {
       points: 0,
@@ -115,8 +139,18 @@ document.addEventListener("DOMContentLoaded", () => {
       losses: 0,
       gf: 0,
       ga: 0,
+      history: "",
     },
-    Viana: { points: 0, games: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0 },
+    Viana: {
+      points: 0,
+      games: 0,
+      wins: 0,
+      draws: 0,
+      losses: 0,
+      gf: 0,
+      ga: 0,
+      history: "",
+    },
   };
 
   function updateTable() {
@@ -133,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     sortedTeams.forEach(([team, data], index) => {
       const row = document.createElement("tr");
+
       row.innerHTML = `
         <td>${index + 1}. ${team}</td>
         <td>${data.points}</td>
@@ -144,9 +179,21 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${data.ga}</td>
         <td>${data.gf - data.ga}</td>
         <td>${((data.points / (data.games * 3)) * 100 || 0).toFixed(2)}%</td>
-        <td>-</td>
+        <td>${data.history}</td>
       `;
       tableBody.appendChild(row);
+
+      let rowClass = "";
+
+      if (index < 4) {
+        rowClass = "top-four"; // Estilização para os 4 primeiros
+      } else if (index < 6) {
+        rowClass = "x";
+      } else {
+        rowClass = "bottom-two"; // Estilização para os 4 ultimos
+      }
+
+      row.classList.add(rowClass);
     });
   }
 
@@ -174,6 +221,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let statusTeamB = "";
 
   function calcularGolsTotal(time) {
+    let history = [];
+
     let totalGF = 0;
     let totalGA = 0;
 
@@ -189,6 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
           totalGF += jogo.golsA;
           totalGA += jogo.golsB;
           totalGames++;
+
           if (jogo.golsA > jogo.golsB) {
             totalWins++;
           } else if (jogo.golsA < jogo.golsB) {
@@ -196,6 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
           } else {
             totalDraws++;
           }
+          history.push(jogo.statusTeamA);
         }
         if (jogo.teamB === time && !isNaN(jogo.golsB)) {
           totalGF += jogo.golsB;
@@ -208,6 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
           } else {
             totalDraws++;
           }
+          history.push(jogo.statusTeamB);
         }
       });
     });
@@ -219,25 +271,13 @@ document.addEventListener("DOMContentLoaded", () => {
       empates: totalDraws,
       derrotas: totalLosses,
       jogos: totalGames,
+      historico: history,
     };
   }
 
   // Exemplo de uso para o time "Tuntum"
 
   function calculateResults() {
-    Object.keys(teamsData).forEach((team) => {
-      if (!teamsData[team]) {
-        teamsData[team] = {
-          points: 0,
-          games: 0,
-          wins: 0,
-          draws: 0,
-          losses: 0,
-          gf: 0,
-          ga: 0,
-        };
-      }
-    });
     const cards = cardsContainer.querySelectorAll(".card");
 
     cards.forEach((card) => {
@@ -281,6 +321,32 @@ document.addEventListener("DOMContentLoaded", () => {
               statusTeamA = "draw";
               statusTeamB = "draw";
             }
+
+            rounds[currentRound][index].statusTeamA = statusTeamA;
+            rounds[currentRound][index].statusTeamB = statusTeamB;
+
+            function getLastResults(team) {
+              const historico = calcularGolsTotal(team).historico;
+              return [
+                historico[historico.length - 1],
+                historico[historico.length - 2],
+                historico[historico.length - 3],
+                historico[historico.length - 4],
+                historico[historico.length - 5],
+              ];
+            }
+
+            const [teamA1, teamA2, teamA3, teamA4, teamA5] =
+              getLastResults(teamA);
+            const [teamB1, teamB2, teamB3, teamB4, teamB5] =
+              getLastResults(teamB);
+
+            teamsData[
+              teamA
+            ].history = `<span class="${teamA5}"></span> <span class="${teamA4}"></span> <span class="${teamA3}"></span> <span class="${teamA2}"></span> <span class="${teamA1}"></span>`;
+            teamsData[
+              teamB
+            ].history = `<span class="${teamB5}"></span> <span class="${teamB4}"></span> <span class="${teamB3}"></span> <span class="${teamB2}"></span> <span class="${teamB1}"></span>`;
           }
         });
 

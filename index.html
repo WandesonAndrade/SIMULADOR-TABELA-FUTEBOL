@@ -4,10 +4,73 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Classificação e Jogos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/1395b45b7b.js"
+      crossorigin="anonymous"
+    ></script>
     <link rel="stylesheet" href="/css/styles.css" />
     <script src="/js/script.js" defer></script>
   </head>
   <body>
+    <div class="container">
+      <header>
+        <h1>Simulador de Resultado do Campeonato Maranhense</h1>
+      </header>
+      <section class="funcionalidades">
+        <h2>Funcionalidades</h2>
+        <ul>
+          <li>
+            <strong>Classificação Atualizada:</strong> Veja a tabela com
+            pontuação, saldo de gols e desempenho.
+          </li>
+          <li>
+            <strong>Simulação de Partidas:</strong> Insira resultados e
+            visualize a classificação.
+          </li>
+          <li>
+            <strong>Estatísticas Detalhadas:</strong> Dados como artilharia e
+            desempenho recente.
+          </li>
+          <li>
+            <strong>Destaques do Campeonato:</strong> Informações sobre os
+            quatro primeiros e os dois últimos colocados.
+          </li>
+        </ul>
+      </section>
+      <section class="como-funciona">
+        <h2>Como Funciona</h2>
+        <p>
+          Escolha os times e insira os resultados das partidas. O simulador
+          recalcula automaticamente a classificação.
+        </p>
+        <ul>
+          <li>3 pontos por vitória</li>
+          <li>1 ponto por empate</li>
+          <li>0 pontos por derrota</li>
+        </ul>
+      </section>
+      <section class="criterios-desempate">
+        <h2>Critérios de Desempate</h2>
+        <ul>
+          <li>Saldo de guls</li>
+          <li>Gols marcados</li>
+          <li>Confronto direto</li>
+        </ul>
+      </section>
+      <section class="experimente">
+        <h2>Experimente Agora</h2>
+        <p>
+          Insira os placares e descubra quais times têm mais chances de avançar!
+        </p>
+      </section>
+    </div>
+
     <div class="container">
       <!-- Seção da Tabela -->
       <section class="tabela">
@@ -36,9 +99,14 @@
       <section class="jogos">
         <h1>JOGOS</h1>
         <div class="rodadas">
-          <button class="rodada-btn prev-btn">&lt;</button>
+          <button class="rodada-btn prev-btn">
+            <i class="fa-solid fa-circle-arrow-left"></i> Anterior
+          </button>
           <h2 id="rodada-title">2ª RODADA</h2>
-          <button class="rodada-btn next-btn">&gt;</button>
+          <button class="rodada-btn next-btn">
+            Proxima
+            <i class="fa-solid fa-circle-arrow-right"></i>
+          </button>
         </div>
         <div id="cards-container" class="cards-container">
           <!-- Cards dos jogos da rodada atual -->
