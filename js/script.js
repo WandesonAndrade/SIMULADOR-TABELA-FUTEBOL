@@ -275,8 +275,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  // Exemplo de uso para o time "Tuntum"
-
   function calculateResults() {
     const cards = cardsContainer.querySelectorAll(".card");
 
@@ -401,14 +399,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateTable();
   }
-  //botao prev rodada
+
   document.querySelector(".prev-btn").addEventListener("click", () => {
     if (currentRound > 0) {
       currentRound--;
       renderRound();
     }
   });
-  //botao next rodada
+
   document.querySelector(".next-btn").addEventListener("click", () => {
     if (currentRound < rounds.length - 1) {
       currentRound++;
