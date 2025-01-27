@@ -186,11 +186,11 @@ document.addEventListener("DOMContentLoaded", () => {
       let rowClass = "";
 
       if (index < 4) {
-        rowClass = "top-four"; // Estilização para os 4 primeiros
+        rowClass = "top-four";
       } else if (index < 6) {
         rowClass = "x";
       } else {
-        rowClass = "bottom-two"; // Estilização para os 4 ultimos
+        rowClass = "bottom-two";
       }
 
       row.classList.add(rowClass);
